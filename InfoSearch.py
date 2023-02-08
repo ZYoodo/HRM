@@ -1,3 +1,5 @@
+import PyQt5.QtWidgets
+
 import FileRead
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QWidget, QBoxLayout, QPushButton, QLabel, QComboBox
 from PyQt5.QtCore import Qt
@@ -24,7 +26,7 @@ def info_search_window_init(choice_window: QWidget):
     info_search_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
 
     # 信息更新时间说明
-    last_update_tittle = QLabel('信息最近更新日期:' + get_info_date(), info_search_window)
+    last_update_tittle = QLabel(info_search_window)
     last_update_tittle.show()
     info_search_layout.addWidget(last_update_tittle)
 
@@ -100,6 +102,7 @@ def info_search_window_init(choice_window: QWidget):
     word_search_btn = QPushButton('搜索', info_search_window)
     word_search_btn.setMaximumSize(40, 25)
     word_search_btn.show()
+    word_search_btn.setShortcut(Qt.Key_Return)
     word_search_btn.clicked.connect(lambda: search_func(get_info_ids_by_word_regexp))
     search_layout.addWidget(word_search_btn)
 
@@ -157,11 +160,22 @@ def info_search_window_init(choice_window: QWidget):
     show_text_edit.show()
     info_search_layout.addWidget(show_text_edit)
 
+    # 读取info文件并显示文件的日期, 当不存在文件时，锁定该界面
+    try:
+        last_update_text = '信息最近更新日期:' + get_info_date()
+    except Exception as e:
+        last_update_text = e.__str__()
+        for obj in info_search_window.children():
+            if type(obj) == PyQt5.QtWidgets.QPushButton:
+                obj.setEnabled(False)
+
+    last_update_tittle.setText(last_update_text)
+
     # 返回按钮定义
     button_back = QPushButton('返回', info_search_window)
+    button_back.setShortcut(Qt.Key_Escape)
     button_back.clicked.connect(lambda: (choice_window.show(), info_search_window.deleteLater()))
     info_search_layout.addWidget(button_back)
-
 
 def get_info_json():
     """

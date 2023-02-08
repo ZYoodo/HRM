@@ -135,6 +135,8 @@ def get_detail_compare_result_text(data: dict, dates: list, pre_date: str, post_
         output_str += lost_str + '\n' + adds_str + '\n' * 2
     output_str += pre_date + ' 至 ' + post_date + ' 共离职: ' + lost_count.__str__() + '人' + '\n'
     output_str += pre_date + ' 至 ' + post_date + ' 共入职: ' + adds_count.__str__() + '人' + '\n'
+    output_str += '人数变化: ' + len(data[pre_date]['names']).__str__() + ' -> ' + \
+                  len(data[post_date]['names']).__str__()
     return output_str
 
 
@@ -180,6 +182,7 @@ def daily_record_window_init(choice_window: QWidget):
 
     # 返回按钮定义
     button_back = QPushButton('返回', daily_record_window)
+    button_back.setShortcut(Qt.Key_Escape)
     button_back.clicked.connect(lambda: (choice_window.show(), daily_record_window.deleteLater()))
     daily_record_layout.addWidget(button_back)
 
@@ -190,14 +193,6 @@ def quick_compare_window_init(choice_window: QWidget):
     :param choice_window:
     :return:
     """
-    data, dates = FileRead.read_data_json()
-    output_str: str = ''
-    if len(dates) < 2:
-        output_str = '历史数据数量不足'
-    else:
-        pre_date = dates[-2]
-        post_date = dates[-1]
-        output_str = get_compare_result_text(data, pre_date, post_date)
 
     # 初始化窗口
     main_window: QWidget = choice_window.parent()
@@ -215,15 +210,27 @@ def quick_compare_window_init(choice_window: QWidget):
 
     # 展示输出文本
     show_text = QTextEdit(quick_compare_window)
-    show_text.setText(output_str)
     show_text.show()
     quick_compare_layout.addWidget(show_text)
 
     # 返回按钮定义
     button_back = QPushButton('返回', quick_compare_window)
+    button_back.setShortcut(Qt.Key_Escape)
     button_back.clicked.connect(lambda: (choice_window.show(), quick_compare_window.deleteLater()))
     quick_compare_layout.addWidget(button_back)
 
+    try:
+        data, dates = FileRead.read_data_json()
+        if len(dates) < 2:
+            output_str = '历史数据数量不足'
+            show_text.setText(output_str)
+        else:
+            pre_date = dates[-2]
+            post_date = dates[-1]
+            output_str = get_compare_result_text(data, pre_date, post_date)
+            show_text.setText(output_str)
+    except Exception as e:
+        show_text.setText(e.__str__())
 
 def diy_compare_window_init(choice_window: QWidget):
     """
@@ -231,8 +238,6 @@ def diy_compare_window_init(choice_window: QWidget):
     :param choice_window:
     :return:
     """
-    # 初始化数据
-    data, dates = FileRead.read_data_json()
 
     # 初始化窗口
     main_window: QWidget = choice_window.parent()
@@ -261,7 +266,6 @@ def diy_compare_window_init(choice_window: QWidget):
 
     pre_date_combox = QComboBox(diy_compare_window)
     pre_date_combox.show()
-    pre_date_combox.addItems(dates[::-1])
     tittle_layout.addWidget(pre_date_combox)
 
     post_date_label = QLabel(diy_compare_window)
@@ -272,7 +276,6 @@ def diy_compare_window_init(choice_window: QWidget):
 
     post_date_combox = QComboBox(diy_compare_window)
     post_date_combox.show()
-    post_date_combox.addItems(dates[::-1])
     tittle_layout.addWidget(post_date_combox)
 
     # 输出模式
@@ -301,13 +304,26 @@ def diy_compare_window_init(choice_window: QWidget):
     # 确认按钮
     commit_btn = QPushButton(diy_compare_window)
     commit_btn.setText('确认')
+    commit_btn.setShortcut(Qt.Key_Return)
     commit_btn.clicked.connect(lambda: show_text.setText(get_compare_result()))
     diy_compare_layout.addWidget(commit_btn)
 
     # 返回按钮定义
     button_back = QPushButton('返回', diy_compare_window)
+    button_back.setShortcut(Qt.Key_Escape)
     button_back.clicked.connect(lambda: (choice_window.show(), diy_compare_window.deleteLater()))
     diy_compare_layout.addWidget(button_back)
 
     diy_compare_layout.addLayout(tittle_layout)
     diy_compare_window.setLayout(diy_compare_layout)
+
+    # 初始化数据
+    try:
+        data, dates = FileRead.read_data_json()
+        pre_date_combox.addItems(dates[::-1])
+        post_date_combox.addItems(dates[::-1])
+    except Exception as e:
+        # 若不存在文件
+        show_text.setText(e.__str__())
+        commit_btn.setEnabled(False)
+

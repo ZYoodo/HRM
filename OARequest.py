@@ -93,11 +93,11 @@ def oa_request_window_init(choice_window: QWidget):
         :return:
         """
         # 读取headers
-        if not os.path.exists('headers.json'):
+        if not os.path.exists('jsons/headers.json'):
             show_text_edit.setText('cookie不存在')
             return
         try:
-            with open('headers.json', 'r', encoding='utf-8') as f:
+            with open('jsons/headers.json', 'r', encoding='utf-8') as f:
                 headers = dict(json.load(f))
 
             cookie = headers.get('cookie')
@@ -169,6 +169,7 @@ def oa_request_window_init(choice_window: QWidget):
 
     # 返回按钮定义
     button_back = QPushButton('返回', oa_request_window)
+    button_back.setShortcut(Qt.Key_Escape)
     button_back.clicked.connect(lambda: (choice_window.show(), oa_request_window.deleteLater()))
     oa_request_layout.addWidget(button_back)
 
@@ -211,7 +212,7 @@ class UpdateInfoThread(QThread):
     def set_info(self, interval: float):
         self.interval = interval
         self.api_url = 'https://oa.synyi.com/api/hrm/resource/getResourceCard?operation=getResourceBaseView&id='
-        with open('headers.json', 'r', encoding='utf-8') as f:
+        with open('jsons/headers.json', 'r', encoding='utf-8') as f:
             self.headers = dict(json.load(f))
 
 
@@ -282,10 +283,16 @@ def download_headers(user: str, password: str):
     driver.get(url)
 
     # 完成登录
-    time.sleep(3)
-    driver.find_element(By.ID, 'loginid').send_keys(user)
-    driver.find_element(By.ID, 'userpassword').send_keys(password)
-    driver.find_element(By.ID, 'submit').click()
+    while True:
+        try:
+            driver.find_element(By.ID, 'loginid')
+        except Exception as e:
+            continue
+
+        driver.find_element(By.ID, 'loginid').send_keys(user)
+        driver.find_element(By.ID, 'userpassword').send_keys(password)
+        driver.find_element(By.ID, 'submit').click()
+        break
     time.sleep(2)
 
     # 通过判断是否还存在登录框来判断登录成功
@@ -321,7 +328,7 @@ def download_headers(user: str, password: str):
 
     headers.update({'cookie': cookie})
 
-    with open('headers.json', 'w', encoding='utf-8') as f:
+    with open('jsons/headers.json', 'w', encoding='utf-8') as f:
         json.dump(headers, f)
 
 
@@ -584,10 +591,10 @@ def request_cardinfo_by_id(id: int):
     :return:
     """
     # 读取headers
-    if not os.path.exists('headers.json'):
+    if not os.path.exists('jsons/headers.json'):
         download_headers()
 
-    with open('headers.json', 'r', encoding='utf-8') as f:
+    with open('jsons/headers.json', 'r', encoding='utf-8') as f:
         headers = dict(json.load(f))
 
     # 请求接口

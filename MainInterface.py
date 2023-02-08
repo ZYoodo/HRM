@@ -2,13 +2,14 @@
 主界面
 """
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QVBoxLayout, QPushButton, QApplication
 from PyQt5.QtCore import Qt
 import sys
 
 import Compare
 import InfoSearch
 import OARequest
+import FileImport
 
 class MainInterface:
     """
@@ -17,7 +18,7 @@ class MainInterface:
     # 定义窗口大小
     main_window_width = 500
     main_window_height = 600
-    version = 'v 0.9测试版'
+    version = 'v 1.1正式版'
 
     def __init__(self):
         self.app = QApplication(sys.argv)
@@ -101,10 +102,10 @@ class MainInterface:
         info_update_btn.clicked.connect(lambda: OARequest.oa_request_window_init(choice_window))
         choice_window_layout.addWidget(info_update_btn)
 
-        # extend_btn = QPushButton('更多测试功能')
-        # extend_btn.setStyleSheet('font-size: 30px')
-        # extend_btn.clicked.connect(lambda: Test.info_search_window_init(main_interface.choice_window))
-        # choice_window_layout.addWidget(extend_btn)
+        extend_btn = QPushButton('导入文件')
+        extend_btn.setStyleSheet('font-size: 30px')
+        extend_btn.clicked.connect(lambda: FileImport.file_import_window_init(choice_window))
+        choice_window_layout.addWidget(extend_btn)
 
         exit_btn = QPushButton()
         exit_btn.setText('退出')
