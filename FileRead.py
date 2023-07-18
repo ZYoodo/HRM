@@ -93,6 +93,10 @@ def read_login_json():
 
 
 def import_file(file_path: str, file_name: str):
+
+    if not os.path.exists('jsons'):
+        os.mkdir('jsons')
+
     try:
         shutil.copyfile(file_path, os.path.curdir + '/'+file_name)
     except Exception as e:
