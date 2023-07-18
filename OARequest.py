@@ -213,6 +213,8 @@ class UpdateInfoThread(QThread):
     def set_info(self, interval: float):
         self.interval = interval
         self.api_url = 'https://oa.synyi.com/api/hrm/resource/getResourceCard?operation=getResourceBaseView&id='
+
+        FileRead.mkdir('jsons')
         with open('jsons/headers.json', 'r', encoding='utf-8') as f:
             self.headers = dict(json.load(f))
 
@@ -234,7 +236,7 @@ class UpdateInfoThread(QThread):
 
         # 开始遍历
         begin_time = time.time()
-        while id < 30:
+        while True:
             response = requests.get(self.api_url + id.__str__(), headers=self.headers)
             cardinfo = CardInfos(response.text)
             # 输出提示
@@ -256,9 +258,6 @@ class UpdateInfoThread(QThread):
                     + f'目前id为{max_id.__str__()}, 共读取{len(infos_json).__str__()}条信息'
         self.emit_show_text(show_text)
         FileRead.write_info_json(infos_json)
-
-        # 备份文件
-        FileRead.backup_info_json()
 
 
     @pyqtSlot(str)

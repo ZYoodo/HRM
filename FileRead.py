@@ -3,6 +3,11 @@ import os.path
 import datetime
 import shutil
 
+
+def mkdir(dir_path):
+    if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
+
 def read_data_json():
     """
     读取data.json
@@ -24,8 +29,7 @@ def write_data_json(write_data: dict):
     :param write_data:
     :return:
     """
-    if not os.path.exists('jsons'):
-        os.mkdir('jsons')
+    mkdir('jsons')
 
     with open('jsons/data.json', 'w') as f:
         json.dump(write_data, f)
@@ -47,21 +51,12 @@ def read_info_json():
 
 def write_info_json(info_json: dict):
 
-    if not os.path.exists('jsons'):
-        os.mkdir('jsons')
+    mkdir('jsons')
 
     with open('jsons/infos.json', 'w', encoding='utf-8') as f:
         today = datetime.date.today().__str__()
         json.dump({today: info_json}, f)
 
-
-def backup_info_json():
-    if not os.path.exists('history'):
-        os.mkdir('history')
-
-    date, data = read_info_json()
-    with open(f'history/info{date}.json', 'w', encoding='utf-8') as f:
-        json.dump({date: data}, f)
 
 
 def is_exists_login_json():
@@ -73,8 +68,7 @@ def write_login_json(user: str, password: str):
     保存登录信息
     :return:
     """
-    if not os.path.exists('jsons'):
-        os.mkdir('jsons')
+    mkdir('jsons')
 
     with open('jsons/login.json', 'w', encoding='utf-8') as f:
         json.dump({'user': user, 'password': password}, f)
@@ -94,10 +88,10 @@ def read_login_json():
 
 def import_file(file_path: str, file_name: str):
 
-    if not os.path.exists('jsons'):
-        os.mkdir('jsons')
+    mkdir('jsons')
 
     try:
         shutil.copyfile(file_path, os.path.curdir + '/'+file_name)
     except Exception as e:
         raise Exception(e.__str__())
+
