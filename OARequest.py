@@ -51,6 +51,7 @@ def oa_request_window_init(choice_window: QWidget):
     login_lay_out.addWidget(password_label)
 
     password_lineedit = QLineEdit(oa_request_window)
+    password_lineedit.setEchoMode(QLineEdit.Password)
     password_lineedit.show()
     login_lay_out.addWidget(password_lineedit)
 
@@ -233,7 +234,7 @@ class UpdateInfoThread(QThread):
 
         # 开始遍历
         begin_time = time.time()
-        while True:
+        while id < 30:
             response = requests.get(self.api_url + id.__str__(), headers=self.headers)
             cardinfo = CardInfos(response.text)
             # 输出提示
@@ -253,7 +254,7 @@ class UpdateInfoThread(QThread):
         end_time = time.time()
         show_text = f'读取结束,耗时约{round(end_time-begin_time)}秒，合计约{round((end_time-begin_time)/60)}分钟\n' \
                     + f'目前id为{max_id.__str__()}, 共读取{len(infos_json).__str__()}条信息'
-        self.emit_show_text()
+        self.emit_show_text(show_text)
         FileRead.write_info_json(infos_json)
 
         # 备份文件
@@ -279,7 +280,7 @@ def download_headers(user: str, password: str):
     option = webdriver.ChromeOptions()
     option.add_argument("headless")
 
-    driver = webdriver.Chrome(service=service, chrome_options=option)
+    driver = webdriver.Chrome(service=service, options=option)
     driver.get(url)
 
     # 完成登录

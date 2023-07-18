@@ -24,6 +24,9 @@ def write_data_json(write_data: dict):
     :param write_data:
     :return:
     """
+    if not os.path.exists('jsons'):
+        os.mkdir('jsons')
+
     with open('jsons/data.json', 'w') as f:
         json.dump(write_data, f)
 
@@ -43,6 +46,10 @@ def read_info_json():
 
 
 def write_info_json(info_json: dict):
+
+    if not os.path.exists('jsons'):
+        os.mkdir('jsons')
+
     with open('jsons/infos.json', 'w', encoding='utf-8') as f:
         today = datetime.date.today().__str__()
         json.dump({today: info_json}, f)
@@ -66,6 +73,9 @@ def write_login_json(user: str, password: str):
     保存登录信息
     :return:
     """
+    if not os.path.exists('jsons'):
+        os.mkdir('jsons')
+
     with open('jsons/login.json', 'w', encoding='utf-8') as f:
         json.dump({'user': user, 'password': password}, f)
 

@@ -18,7 +18,7 @@ class MainInterface:
     # 定义窗口大小
     main_window_width = 500
     main_window_height = 600
-    version = 'v 1.1正式版'
+    version = 'v 1.2正式版'
 
     def __init__(self):
         self.app = QApplication(sys.argv)
